@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wilshire Rewind - Sermon Archive</title>
+    <link rel="alternate" type="application/rss+xml" href="feed.xml">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #f5f2ec;
+            color: #2c2c2c;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #1a1a2e;
+            color: #e8e0d0;
+            padding: 2.5rem 2rem 1.75rem;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.4rem;
+            letter-spacing: 0.04em;
+            font-weight: normal;
+        }
+
+        header p {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #a09880;
+            font-style: italic;
+        }
+
+        main {
+            max-width: 760px;
+            margin: 3rem auto;
+            padding: 0 1.5rem;
+        }
+
+        h2.section-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #888;
+            border-bottom: 1px solid #d4cfc7;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.75rem;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-weight: normal;
+        }
+
+        .sermon-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+        }
+
+        .sermon-card {
+            background: #fff;
+            border: 1px solid #ddd8ce;
+            border-radius: 4px;
+            padding: 1.5rem 1.75rem;
+        }
+
+        .sermon-meta {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .sermon-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #1a1a2e;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            text-decoration: none;
+        }
+
+        .sermon-title:hover {
+            text-decoration: underline;
+        }
+
+        .sermon-duration {
+            font-size: 0.8rem;
+            color: #999;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .sermon-byline {
+            font-size: 0.82rem;
+            color: #999;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin-bottom: 0.75rem;
+        }
+
+        .sermon-excerpt {
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: #555;
+            margin-bottom: 1.25rem;
+        }
+
+        audio {
+            width: 100%;
+            height: 36px;
+            margin-bottom: 0.9rem;
+            accent-color: #1a1a2e;
+        }
+
+        .sermon-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .sermon-links a {
+            font-size: 0.8rem;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #6b5c3e;
+            text-decoration: none;
+            border-bottom: 1px solid #c4b49a;
+            padding-bottom: 1px;
+        }
+
+        .sermon-links a:hover {
+            color: #1a1a2e;
+            border-bottom-color: #1a1a2e;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            font-size: 0.8rem;
+            color: #aaa;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Wilshire Rewind</h1>
+    <p>Sermon Archive</p>
+</header>
+
+<main>
+    <h2 class="section-label">Sermons</h2>
+
+    <div class="sermon-list" id="sermon-list"></div>
+</main>
+
+<footer>
+    <a href="feed.xml" style="color: #aaa; text-decoration: none; border-bottom: 1px solid #ddd8ce; padding-bottom: 1px;">Subscribe via RSS</a>
+</footer>
+
+<script src="search.js"></script>
+<script>
+    fetch('sermons.json')
+        .then(r => r.json())
+        .then(sermons => {
+            const list = document.getElementById('sermon-list');
+            list.innerHTML = sermons.map(s => `
+                <div class="sermon-card">
+                    <div class="sermon-meta">
+                        <a class="sermon-title" href="sermon.html?id=${s.id}">${s.title || 'Unknown title'}</a>
+                        <span class="sermon-duration">${s.durationDisplay}</span>
+                    </div>
+                    <p class="sermon-byline">${[s.speaker || 'Unknown speaker', s.series, s.dateFormatted].filter(Boolean).join(' · ')}</p>
+                    <p class="sermon-excerpt">${s.excerpt}</p>
+                    <audio controls preload="none">
+                        <source src="${s.audioUrl}" type="audio/mpeg">
+                    </audio>
+                    <div class="sermon-links">
+                        <a href="${s.transcriptUrl}">Read transcript</a>
+                        <a href="${s.captionsUrl}">Download captions</a>
+                    </div>
+                </div>
+            `).join('');
+        });
+</script>
+</body>
+</html>

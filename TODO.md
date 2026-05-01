@@ -1,0 +1,1 @@
+* Don't use a separate metadata file. Everything should come from the MP3s.
