@@ -140,6 +140,14 @@
             margin-bottom: 1.2em;
         }
 
+        .transcript-notice {
+            font-size: 0.82rem;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #888;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+        }
+
         footer {
             text-align: center;
             padding: 3rem 1rem 2rem;
@@ -209,6 +217,7 @@
                 <a href="${s.captionsUrl}">Download captions</a>
             </div>
             <h2 class="transcript-label">Transcription</h2>
+            <p class="transcript-notice">Please note that transcriptions are machine-generated and may not be accurate.</p>
             <div class="transcript">${transcriptHtml}</div>
         `;
     });
