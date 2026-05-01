@@ -4,6 +4,27 @@
 // ── styles ────────────────────────────────────────────────────────────────────
 const styleEl = document.createElement('style');
 styleEl.textContent = `
+.header-nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+.header-nav a {
+  color: #a09880;
+  text-decoration: none;
+  text-transform: uppercase;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+  cursor: pointer;
+}
+.header-nav a:hover, .header-nav a.active {
+  color: #e8e0d0;
+  border-bottom-color: #a09880;
+}
 .search-wrapper {
   position: relative;
   margin: 1.25rem auto 0;
@@ -119,7 +140,20 @@ mark { background: #fff3b0; color: inherit; border-radius: 2px; }
 `;
 document.head.appendChild(styleEl);
 
-// ── inject search bar ─────────────────────────────────────────────────────────
+// ── inject nav + search bar ───────────────────────────────────────────────────
+const path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+const navActive = path === 'about.html' ? 'about'
+                : (path === 'index.html' || path === '') ? 'home'
+                : null;
+
+document.querySelector('header').insertAdjacentHTML('afterbegin', `
+  <nav class="header-nav">
+    <a href="index.html"${navActive === 'home' ? ' class="active"' : ''}>Home</a>
+    <a href="#" id="nav-random">Random</a>
+    <a href="about.html"${navActive === 'about' ? ' class="active"' : ''}>About</a>
+  </nav>
+`);
+
 document.querySelector('header').insertAdjacentHTML('beforeend', `
   <div class="search-wrapper">
     <input type="search" id="search-input"
@@ -129,6 +163,14 @@ document.querySelector('header').insertAdjacentHTML('beforeend', `
     <ul id="suggestions" hidden role="listbox"></ul>
   </div>
 `);
+
+document.getElementById('nav-random').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const sermons = await loadSermons();
+    if (!sermons.length) return;
+    const r = sermons[Math.floor(Math.random() * sermons.length)];
+    location.href = `sermon.html?id=${r.id}`;
+});
 
 const input   = document.getElementById('search-input');
 const suggBox = document.getElementById('suggestions');

@@ -36,9 +36,77 @@
         }
 
         main {
-            max-width: 760px;
+            max-width: 1100px;
             margin: 3rem auto;
             padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (max-width: 720px) {
+            main {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        .sidebar {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .filter-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .filter-group h3 {
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #888;
+            border-bottom: 1px solid #d4cfc7;
+            padding-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
+            font-weight: normal;
+        }
+
+        .filter-item {
+            font-size: 0.85rem;
+            padding: 0.25rem 0;
+            color: #555;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .filter-item:hover { color: #1a1a2e; }
+
+        .filter-item.active {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        .filter-item.active::before {
+            content: "✓ ";
+            color: #6b5c3e;
+        }
+
+        .filter-clear {
+            font-size: 0.75rem;
+            color: #6b5c3e;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            display: inline-block;
+            border-bottom: 1px solid #c4b49a;
+            padding-bottom: 1px;
+        }
+
+        .filter-clear:hover { color: #1a1a2e; border-bottom-color: #1a1a2e; }
+
+        .empty-message {
+            color: #888;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.9rem;
+            padding: 1rem 0;
         }
 
         h2.section-label {
@@ -148,9 +216,11 @@
 </header>
 
 <main>
-    <h2 class="section-label">Sermons</h2>
-
-    <div class="sermon-list" id="sermon-list"></div>
+    <aside class="sidebar" id="sidebar"></aside>
+    <div class="content">
+        <h2 class="section-label">Sermons</h2>
+        <div class="sermon-list" id="sermon-list"></div>
+    </div>
 </main>
 
 <footer>
@@ -159,11 +229,73 @@
 
 <script src="search.js"></script>
 <script>
-    fetch('sermons.json')
-        .then(r => r.json())
-        .then(sermons => {
-            const list = document.getElementById('sermon-list');
-            list.innerHTML = sermons.map(s => `
+    fetch('sermons.json').then(r => r.json()).then(sermons => {
+        const list = document.getElementById('sermon-list');
+        const sidebar = document.getElementById('sidebar');
+
+        const speakerOf = s => s.speaker || 'Unknown speaker';
+        const seriesOf  = s => s.series  || 'Unknown series';
+        const yearOf    = s => s.date.slice(0, 4);
+
+        const filters = { speaker: new Set(), series: new Set(), year: new Set() };
+        sermons.forEach(s => {
+            filters.speaker.add(speakerOf(s));
+            filters.series.add(seriesOf(s));
+            filters.year.add(yearOf(s));
+        });
+
+        const active = { speaker: new Set(), series: new Set(), year: new Set() };
+
+        const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+        const passes = s => {
+            if (active.speaker.size && !active.speaker.has(speakerOf(s))) return false;
+            if (active.series.size  && !active.series.has(seriesOf(s)))   return false;
+            if (active.year.size    && !active.year.has(yearOf(s)))       return false;
+            return true;
+        };
+
+        const totalActive = () => active.speaker.size + active.series.size + active.year.size;
+
+        function renderSidebar() {
+            const groups = [
+                { key: 'speaker', label: 'Pastor', sortDesc: false },
+                { key: 'series',  label: 'Series', sortDesc: false },
+                { key: 'year',    label: 'Year',   sortDesc: true  },
+            ];
+            const html = groups.map(g => {
+                const values = [...filters[g.key]].sort();
+                if (g.sortDesc) values.reverse();
+                return `<div class="filter-group">
+                    <h3>${g.label}</h3>
+                    ${values.map(v => `<div class="filter-item${active[g.key].has(v) ? ' active' : ''}" data-key="${g.key}" data-value="${esc(v)}">${esc(v)}</div>`).join('')}
+                </div>`;
+            }).join('');
+            const clear = totalActive() ? `<a class="filter-clear" id="filter-clear">Clear filters</a>` : '';
+            sidebar.innerHTML = html + clear;
+
+            sidebar.querySelectorAll('.filter-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const k = el.dataset.key, v = el.dataset.value;
+                    if (active[k].has(v)) active[k].delete(v);
+                    else active[k].add(v);
+                    render();
+                });
+            });
+            const clearBtn = document.getElementById('filter-clear');
+            if (clearBtn) clearBtn.addEventListener('click', () => {
+                Object.values(active).forEach(set => set.clear());
+                render();
+            });
+        }
+
+        function renderList() {
+            const filtered = sermons.filter(passes);
+            if (!filtered.length) {
+                list.innerHTML = `<p class="empty-message">No sermons match the current filters.</p>`;
+                return;
+            }
+            list.innerHTML = filtered.map(s => `
                 <div class="sermon-card">
                     <div class="sermon-meta">
                         <a class="sermon-title" href="sermon.html?id=${s.id}">${s.title || 'Unknown title'}</a>
@@ -180,7 +312,11 @@
                     </div>
                 </div>
             `).join('');
-        });
+        }
+
+        function render() { renderSidebar(); renderList(); }
+        render();
+    });
 </script>
 </body>
 </html>
