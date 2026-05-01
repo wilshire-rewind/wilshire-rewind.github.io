@@ -135,7 +135,7 @@ def load_sermons():
             "series": tags.get("TALB", ""),
             "audioUrl": f"audio/{name}.mp3",
             "transcriptUrl": f"transcriptions/{name}.txt",
-            "captionsUrl": f"subtitles/{name}.srt",
+            "captionsUrl": f"subtitles/{name}.srt" if srt.exists() else "",
             "fileSizeBytes": mp3.stat().st_size,
             "_text": text,
         })
@@ -155,6 +155,10 @@ def build_rss(sermons, config):
         pub = date.strftime("%a, %d %b %Y 00:00:00 +0000")
         url = f"{site_url}/{s['audioUrl']}"
         item_title = s["title"] or s["dateFormatted"]
+        transcript_tag = ""
+        if s["captionsUrl"]:
+            srt_url = escape(f"{site_url}/{s['captionsUrl']}")
+            transcript_tag = f'\n      <podcast:transcript url="{srt_url}" type="application/x-subrip"/>'
         items.append(f"""\
     <item>
       <title>{escape(item_title)}</title>
@@ -162,7 +166,7 @@ def build_rss(sermons, config):
       <pubDate>{pub}</pubDate>
       <guid isPermaLink="false">{escape(url)}</guid>
       <enclosure url="{escape(url)}" length="{s["fileSizeBytes"]}" type="audio/mpeg"/>
-      <itunes:duration>{s["durationHMS"]}</itunes:duration>
+      <itunes:duration>{s["durationHMS"]}</itunes:duration>{transcript_tag}
     </item>""")
 
     items_str = "\n".join(items)
@@ -170,7 +174,8 @@ def build_rss(sermons, config):
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
      xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
-     xmlns:content="http://purl.org/rss/modules/content/">
+     xmlns:content="http://purl.org/rss/modules/content/"
+     xmlns:podcast="https://podcastindex.org/namespace/1.0">
   <channel>
     <title>{title}</title>
     <link>{escape(site_url)}</link>
