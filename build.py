@@ -5,7 +5,7 @@ import json
 import re
 import struct
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from xml.sax.saxutils import escape
 
@@ -190,6 +190,116 @@ def build_rss(sermons, config):
 """
 
 
+COVERAGE_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coverage — Wilshire Rewind</title>
+    <link rel="alternate" type="application/rss+xml" href="feed.xml">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Georgia, 'Times New Roman', serif; background: #f5f2ec; color: #2c2c2c; min-height: 100vh; }
+        header { background: #1a1a2e; color: #e8e0d0; padding: 2.5rem 2rem 1.75rem; text-align: center; }
+        header h1 { font-size: 2.4rem; letter-spacing: 0.04em; font-weight: normal; }
+        header h1 a { color: inherit; text-decoration: none; }
+        header h1 a:hover { text-decoration: underline; }
+        header p { margin-top: 0.5rem; font-size: 1rem; color: #a09880; font-style: italic; }
+        main { max-width: 1200px; margin: 3rem auto; padding: 0 1.5rem; }
+        h2.section-label {
+            font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #888;
+            border-bottom: 1px solid #d4cfc7; padding-bottom: 0.5rem; margin-bottom: 1rem;
+            font-family: 'Helvetica Neue', Arial, sans-serif; font-weight: normal;
+        }
+        .coverage-intro {
+            font-size: 0.875rem; color: #777; margin-bottom: 1.5rem;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+        .coverage-scroll { overflow-x: auto; padding-bottom: 0.5rem; }
+        .coverage-grid {
+            border-collapse: separate; border-spacing: 2px;
+            table-layout: fixed; min-width: 900px; width: 100%;
+        }
+        .coverage-grid th.year-label {
+            width: 52px; font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.85rem; color: #1a1a2e; font-weight: 600;
+            text-align: right; padding-right: 0.75rem;
+        }
+        .coverage-grid td {
+            background: #e2dccf; font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.66rem; text-align: center; border-radius: 2px; height: 22px;
+        }
+        .coverage-grid td.filled { background: #008622; }
+        .coverage-grid td.filled a {
+            color: #f5f2ec; text-decoration: none;
+            display: block; line-height: 22px;
+        }
+        .coverage-grid td.filled:hover { background: #1a1a2e; }
+        footer { text-align: center; padding: 3rem 1rem 2rem; font-size: 0.8rem; color: #aaa; font-family: 'Helvetica Neue', Arial, sans-serif; }
+    </style>
+</head>
+<body>
+<header>
+    <h1><a href="index.html">Wilshire Rewind</a></h1>
+    <p>Sermon Archive</p>
+</header>
+<main>
+    <h2 class="section-label">Archive Coverage</h2>
+    <div class="coverage-scroll">
+{TABLE}
+    </div>
+</main>
+<footer>
+    <a href="feed.xml" style="color: #aaa; text-decoration: none; border-bottom: 1px solid #ddd8ce; padding-bottom: 1px;">Subscribe via RSS</a>
+</footer>
+<script src="search.js"></script>
+</body>
+</html>
+"""
+
+
+def first_sunday_of(year):
+    d = datetime(year, 1, 1)
+    return d + timedelta(days=(6 - d.weekday()) % 7)
+
+
+def sundays_in_year(year):
+    return (datetime(year, 12, 31) - first_sunday_of(year)).days // 7 + 1
+
+
+def build_coverage(sermons):
+    by_year_n = {}
+    for s in sermons:
+        d = datetime.fromisoformat(s["date"])
+        sunday = d - timedelta(days=(d.weekday() - 6) % 7)
+        year = sunday.year
+        n = (sunday - first_sunday_of(year)).days // 7 + 1
+        by_year_n.setdefault(year, {}).setdefault(n, s)
+
+    cols = max((sundays_in_year(y) for y in by_year_n), default=0)
+
+    rows = []
+    for year in sorted(by_year_n):
+        sundays = by_year_n[year]
+        n_sundays = sundays_in_year(year)
+        cells = []
+        for n in range(1, cols + 1):
+            if n > n_sundays:
+                cells.append('<td class="empty"></td>')
+            elif n in sundays:
+                s = sundays[n]
+                tip = escape(s["title"] or s["dateFormatted"])
+                cells.append(
+                    f'<td class="filled"><a href="sermon.html?id={s["id"]}" title="{tip}"><b>{n}</b></a></td>'
+                )
+            else:
+                cells.append('<td class="empty"></td>')
+        rows.append(f'        <tr><th class="year-label">{year}</th>{"".join(cells)}</tr>')
+
+    table = '<table class="coverage-grid">\n' + "\n".join(rows) + "\n        </table>"
+    return COVERAGE_TEMPLATE.replace("{TABLE}", table)
+
+
 def main():
     config = load_config()
     sermons = load_sermons()
@@ -205,6 +315,9 @@ def main():
 
     (SRC / "feed.xml").write_text(build_rss(sermons, config))
     print("  → src/feed.xml")
+
+    (SRC / "coverage.html").write_text(build_coverage(sermons))
+    print("  → src/coverage.html")
 
 
 if __name__ == "__main__":

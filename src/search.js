@@ -142,13 +142,15 @@ document.head.appendChild(styleEl);
 
 // ── inject nav + search bar ───────────────────────────────────────────────────
 const path = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
-const navActive = path === 'about.html' ? 'about'
+const navActive = path === 'about.html'    ? 'about'
+                : path === 'coverage.html' ? 'coverage'
                 : (path === 'index.html' || path === '') ? 'home'
                 : null;
 
 document.querySelector('header').insertAdjacentHTML('afterbegin', `
   <nav class="header-nav">
     <a href="index.html"${navActive === 'home' ? ' class="active"' : ''}>Home</a>
+    <a href="coverage.html"${navActive === 'coverage' ? ' class="active"' : ''}>Coverage</a>
     <a href="#" id="nav-random">Random</a>
     <a href="about.html"${navActive === 'about' ? ' class="active"' : ''}>About</a>
   </nav>
