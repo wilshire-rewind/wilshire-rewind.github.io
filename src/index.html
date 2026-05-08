@@ -59,6 +59,18 @@
             margin-bottom: 1.75rem;
         }
 
+        .sort-select {
+            width: 100%;
+            padding: 0.4rem 0.5rem;
+            background: #fff;
+            border: 1px solid #d4cfc7;
+            border-radius: 3px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.85rem;
+            color: #2c2c2c;
+            cursor: pointer;
+        }
+
         .filter-group h3 {
             font-size: 0.7rem;
             letter-spacing: 0.15em;
@@ -246,6 +258,21 @@
 
         const active = { speaker: new Set(), series: new Set(), year: new Set() };
 
+        const sortOptions = [
+            { value: 'date-asc',   label: 'Sermon date (oldest first)' },
+            { value: 'date-desc',  label: 'Sermon date (newest first)' },
+            { value: 'added-desc', label: 'Recently added' },
+        ];
+        let sortKey = 'date-asc';
+
+        const sorters = {
+            'date-asc':   (a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id),
+            'date-desc':  (a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id),
+            'added-desc': (a, b) => (b.addedDate || '').localeCompare(a.addedDate || '')
+                                    || b.date.localeCompare(a.date)
+                                    || b.id.localeCompare(a.id),
+        };
+
         const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
         const passes = s => {
@@ -258,12 +285,18 @@
         const totalActive = () => active.speaker.size + active.series.size + active.year.size;
 
         function renderSidebar() {
+            const sortHtml = `<div class="filter-group">
+                <h3>Sort</h3>
+                <select id="sort-select" class="sort-select">
+                    ${sortOptions.map(o => `<option value="${o.value}"${o.value === sortKey ? ' selected' : ''}>${o.label}</option>`).join('')}
+                </select>
+            </div>`;
             const groups = [
                 { key: 'speaker', label: 'Pastor', sortDesc: false },
                 { key: 'series',  label: 'Series', sortDesc: false },
                 { key: 'year',    label: 'Year',   sortDesc: true  },
             ];
-            const html = groups.map(g => {
+            const filterHtml = groups.map(g => {
                 const values = [...filters[g.key]].sort();
                 if (g.sortDesc) values.reverse();
                 return `<div class="filter-group">
@@ -272,8 +305,12 @@
                 </div>`;
             }).join('');
             const clear = totalActive() ? `<a class="filter-clear" id="filter-clear">Clear filters</a>` : '';
-            sidebar.innerHTML = html + clear;
+            sidebar.innerHTML = sortHtml + filterHtml + clear;
 
+            document.getElementById('sort-select').addEventListener('change', e => {
+                sortKey = e.target.value;
+                renderList();
+            });
             sidebar.querySelectorAll('.filter-item').forEach(el => {
                 el.addEventListener('click', () => {
                     const k = el.dataset.key, v = el.dataset.value;
@@ -290,7 +327,7 @@
         }
 
         function renderList() {
-            const filtered = sermons.filter(passes);
+            const filtered = sermons.filter(passes).sort(sorters[sortKey]);
             if (!filtered.length) {
                 list.innerHTML = `<p class="empty-message">No sermons match the current filters.</p>`;
                 return;

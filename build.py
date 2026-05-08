@@ -4,6 +4,7 @@
 import json
 import re
 import struct
+import subprocess
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -110,7 +111,29 @@ def read_id3_tags(path):
     return result
 
 
+def git_added_dates():
+    """Map each repo-relative path → 'YYYY-MM-DD' of the commit that first added it."""
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(ROOT), "log", "--reverse", "--diff-filter=A",
+             "--name-only", "--format=format:%x00%aI"],
+            capture_output=True, text=True, check=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return {}
+    added = {}
+    current = None
+    for line in out.stdout.split("\n"):
+        if line.startswith("\x00"):
+            current = line[1:11]
+        elif line and current:
+            added.setdefault(line, current)
+    return added
+
+
 def load_sermons():
+    added_dates = git_added_dates()
+    today = datetime.now().strftime("%Y-%m-%d")
     sermons = []
     for mp3 in sorted((SRC / "audio").glob("Sermon_*.mp3")):
         name = mp3.stem
@@ -123,10 +146,12 @@ def load_sermons():
         dur = parse_srt_duration(srt) if srt.exists() else 0
         text = txt.read_text().strip() if txt.exists() else ""
         tags = read_id3_tags(mp3)
+        rel = mp3.relative_to(ROOT).as_posix()
         sermons.append({
             "id": name,
             "date": date.strftime("%Y-%m-%d"),
             "dateFormatted": date.strftime("%B %-d, %Y"),
+            "addedDate": added_dates.get(rel, today),
             "suffix": suffix,
             "durationSeconds": dur,
             "durationDisplay": fmt_display(dur),

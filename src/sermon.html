@@ -202,12 +202,18 @@
             .map(p => `<p>${p}</p>`)
             .join('');
 
+        const [ay, am, ad] = (s.addedDate || '').split('-').map(Number);
+        const addedFmt = ay
+            ? new Date(ay, am - 1, ad).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+            : '';
+        const meta = [s.durationDisplay, addedFmt && `Added ${addedFmt}`].filter(Boolean).join(' · ');
+
         document.getElementById('content').innerHTML = `
             <a class="back" href="index.html">← All sermons</a>
             <div class="sermon-header">
                 <h2>${title}</h2>
                 <p class="sermon-byline">${[speaker, s.series, s.dateFormatted].filter(Boolean).join(' · ')}</p>
-                <span class="duration">${s.durationDisplay}</span>
+                <span class="duration">${meta}</span>
             </div>
             <audio controls preload="none">
                 <source src="${s.audioUrl}" type="audio/mpeg">
