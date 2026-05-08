@@ -42,8 +42,31 @@
             color: #f5f2ec; text-decoration: none;
             display: block; line-height: 22px;
         }
-        .coverage-grid td.filled a:hover { background: #1a1a2e; }
-        .coverage-grid td.filled.multi a + a { border-top: 1px solid rgba(245,242,236,0.35); }
+        .coverage-grid td.filled:hover { background: #1a1a2e; }
+        .coverage-grid td.filled .multi-items { display: none; }
+        .coverage-menu {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ddd8ce;
+            border-radius: 4px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            padding: 0.25rem 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.85rem;
+            z-index: 100;
+            min-width: 200px;
+            max-width: 320px;
+        }
+        .coverage-menu a {
+            display: block;
+            padding: 0.5rem 0.85rem;
+            color: #1a1a2e;
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .coverage-menu a:hover { background: #f5f2ec; }
         footer { text-align: center; padding: 3rem 1rem 2rem; font-size: 0.8rem; color: #aaa; font-family: 'Helvetica Neue', Arial, sans-serif; }
     </style>
 </head>
@@ -58,7 +81,7 @@
 <table class="coverage-grid">
         <tr><th class="year-label">2001</th><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_082601" title="Why Baptism?"><b>34</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_090201" title="Why Communion?"><b>35</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_090901" title="If God Is Good, Why Does Evil Exist?"><b>36</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_092301" title="Science and Miracles"><b>38</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_093001" title="Of Monkeys and Men"><b>39</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_100701" title="Old Testament: God of Love?"><b>40</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_101401" title="One Way!"><b>41</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_102101" title="Eternal Destination"><b>42</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_120901" title="Make a Difference"><b>49</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td></tr>
         <tr><th class="year-label">2002</th><td class="filled"><a href="sermon.html?id=Sermon_010602" title="Til All We Have Left Is Him"><b>1</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_020302" title="Expressions of Love"><b>5</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_021702" title="Upside-Down 401K Plan"><b>7</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_051902" title="The Sound of Music"><b>20</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_080402" title="Worship 101"><b>31</b></a></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_082502" title="Discovering Prayer"><b>34</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_090102" title="The Principles of Answered Prayer"><b>35</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_091502" title="Spiritual Gifts Part 1"><b>37</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_092202" title="Spiritual Gifts Part 2"><b>38</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_092902" title="Spiritual Gifts Part 3"><b>39</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_101302" title="October 13, 2002"><b>41</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_102002" title="It's Fun To Give"><b>42</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_102702" title="Principles for Blessing"><b>43</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_110302" title="Giving Living"><b>44</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_111002" title="Taking the Test"><b>45</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_111702" title="Alabaster Jar"><b>46</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_112402" title="The One Who Said Thanks"><b>47</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_120102" title="He's Coming Again"><b>48</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_121502" title="A Camel's Hair Christmas Card"><b>50</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_122202" title="December 22, 2002"><b>51</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_122902" title="Let's Give Them Something to Talk About"><b>52</b></a></td></tr>
-        <tr><th class="year-label">2003</th><td class="filled"><a href="sermon.html?id=Sermon_010503" title="Be It Resolved..."><b>1</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_011203" title="Getting Together"><b>2</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_021603" title="From Head to Heart"><b>7</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_022303" title="Blind Spots"><b>8</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_030203" title="Up From the Grave"><b>9</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_030903" title="The Path of Blessing"><b>10</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_031603" title="To Be Continued..."><b>11</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_032303" title="Branching Out"><b>12</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_040603" title="Our Stuff and Our Soul"><b>14</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_041303" title="What Will You Lay at Jesus's Feet?"><b>15</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_042003" title="Do You Believe"><b>16</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_042703" title="Pump Up the Volume"><b>17</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_051103" title="Deborah: A Mother of Israel"><b>19</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_051803" title="The Road Ahead"><b>20</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_052503" title="Take This Job and Love It"><b>21</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_060103" title="A Fulfilling Marriage"><b>22</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_060803" title="King's Kids"><b>23</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_070603" title="Be Free!"><b>27</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_080303" title="Getting Beyond Ourselves"><b>31</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_083103" title="Just Do It!"><b>35</b></a></td><td class="filled multi"><a href="sermon.html?id=Sermon_090703" title="From Doubt to Discovery"><b>36</b></a><a href="sermon.html?id=Sermon_090703b" title="Homecoming Sunday"><b>36b</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_100503" title="Get Your Joy On"><b>40</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_101203" title="All You Need Is Love"><b>41</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_101903" title="Faith Walking"><b>42</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_110203" title="Celebrating the Wonder"><b>44</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_110903" title="Living Praise"><b>45</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_111603" title="Who Are You?"><b>46</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_112303" title="Saved to Serve"><b>47</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_113003" title="Chin Up"><b>48</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_120703" title="Prepare the Way"><b>49</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_121403" title="Nothing Is Impossible With God"><b>50</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_122103" title="The Shepherds' Journey"><b>51</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_122803" title="The Only Way To Be Sure"><b>52</b></a></td></tr>
+        <tr><th class="year-label">2003</th><td class="filled"><a href="sermon.html?id=Sermon_010503" title="Be It Resolved..."><b>1</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_011203" title="Getting Together"><b>2</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_021603" title="From Head to Heart"><b>7</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_022303" title="Blind Spots"><b>8</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_030203" title="Up From the Grave"><b>9</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_030903" title="The Path of Blessing"><b>10</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_031603" title="To Be Continued..."><b>11</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_032303" title="Branching Out"><b>12</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_040603" title="Our Stuff and Our Soul"><b>14</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_041303" title="What Will You Lay at Jesus's Feet?"><b>15</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_042003" title="Do You Believe"><b>16</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_042703" title="Pump Up the Volume"><b>17</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_051103" title="Deborah: A Mother of Israel"><b>19</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_051803" title="The Road Ahead"><b>20</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_052503" title="Take This Job and Love It"><b>21</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_060103" title="A Fulfilling Marriage"><b>22</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_060803" title="King's Kids"><b>23</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_070603" title="Be Free!"><b>27</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_080303" title="Getting Beyond Ourselves"><b>31</b></a></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_083103" title="Just Do It!"><b>35</b></a></td><td class="filled"><a class="multi-trigger" href="#" data-id="2003-36" title="2 sermons"><b>36</b></a><div class="multi-items"><a href="sermon.html?id=Sermon_090703">From Doubt to Discovery</a><a href="sermon.html?id=Sermon_090703b">Homecoming Sunday</a></div></td><td class="empty"></td><td class="empty"></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_100503" title="Get Your Joy On"><b>40</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_101203" title="All You Need Is Love"><b>41</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_101903" title="Faith Walking"><b>42</b></a></td><td class="empty"></td><td class="filled"><a href="sermon.html?id=Sermon_110203" title="Celebrating the Wonder"><b>44</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_110903" title="Living Praise"><b>45</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_111603" title="Who Are You?"><b>46</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_112303" title="Saved to Serve"><b>47</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_113003" title="Chin Up"><b>48</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_120703" title="Prepare the Way"><b>49</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_121403" title="Nothing Is Impossible With God"><b>50</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_122103" title="The Shepherds' Journey"><b>51</b></a></td><td class="filled"><a href="sermon.html?id=Sermon_122803" title="The Only Way To Be Sure"><b>52</b></a></td></tr>
         </table>
     </div>
 </main>
@@ -66,5 +89,43 @@
     <a href="feed.xml" style="color: #aaa; text-decoration: none; border-bottom: 1px solid #ddd8ce; padding-bottom: 1px;">Subscribe via RSS</a>
 </footer>
 <script src="search.js"></script>
+<script>
+(function () {
+    let openMenu = null;
+    function closeMenu() {
+        if (openMenu) { openMenu.remove(); openMenu = null; }
+    }
+    document.querySelectorAll('.multi-trigger').forEach(trigger => {
+        trigger.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            const wasOpenFor = openMenu && openMenu.dataset.for === trigger.dataset.id;
+            closeMenu();
+            if (wasOpenFor) return;
+            const items = trigger.parentElement.querySelector('.multi-items');
+            if (!items) return;
+            const menu = document.createElement('div');
+            menu.className = 'coverage-menu';
+            menu.dataset.for = trigger.dataset.id;
+            menu.innerHTML = items.innerHTML;
+            document.body.appendChild(menu);
+            const r = trigger.getBoundingClientRect();
+            const top = r.bottom + window.scrollY + 2;
+            let left = r.left + window.scrollX;
+            const overflow = left + menu.offsetWidth - (window.scrollX + document.documentElement.clientWidth - 8);
+            if (overflow > 0) left -= overflow;
+            menu.style.top = top + 'px';
+            menu.style.left = Math.max(8, left) + 'px';
+            openMenu = menu;
+        });
+    });
+    document.addEventListener('click', e => {
+        if (openMenu && !openMenu.contains(e.target)) closeMenu();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+    window.addEventListener('resize', closeMenu);
+    window.addEventListener('scroll', closeMenu, true);
+})();
+</script>
 </body>
 </html>

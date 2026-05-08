@@ -268,8 +268,31 @@ COVERAGE_TEMPLATE = """<!DOCTYPE html>
             color: #f5f2ec; text-decoration: none;
             display: block; line-height: 22px;
         }
-        .coverage-grid td.filled a:hover { background: #1a1a2e; }
-        .coverage-grid td.filled.multi a + a { border-top: 1px solid rgba(245,242,236,0.35); }
+        .coverage-grid td.filled:hover { background: #1a1a2e; }
+        .coverage-grid td.filled .multi-items { display: none; }
+        .coverage-menu {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ddd8ce;
+            border-radius: 4px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            padding: 0.25rem 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.85rem;
+            z-index: 100;
+            min-width: 200px;
+            max-width: 320px;
+        }
+        .coverage-menu a {
+            display: block;
+            padding: 0.5rem 0.85rem;
+            color: #1a1a2e;
+            text-decoration: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .coverage-menu a:hover { background: #f5f2ec; }
         footer { text-align: center; padding: 3rem 1rem 2rem; font-size: 0.8rem; color: #aaa; font-family: 'Helvetica Neue', Arial, sans-serif; }
     </style>
 </head>
@@ -288,6 +311,44 @@ COVERAGE_TEMPLATE = """<!DOCTYPE html>
     <a href="feed.xml" style="color: #aaa; text-decoration: none; border-bottom: 1px solid #ddd8ce; padding-bottom: 1px;">Subscribe via RSS</a>
 </footer>
 <script src="search.js"></script>
+<script>
+(function () {
+    let openMenu = null;
+    function closeMenu() {
+        if (openMenu) { openMenu.remove(); openMenu = null; }
+    }
+    document.querySelectorAll('.multi-trigger').forEach(trigger => {
+        trigger.addEventListener('click', e => {
+            e.preventDefault();
+            e.stopPropagation();
+            const wasOpenFor = openMenu && openMenu.dataset.for === trigger.dataset.id;
+            closeMenu();
+            if (wasOpenFor) return;
+            const items = trigger.parentElement.querySelector('.multi-items');
+            if (!items) return;
+            const menu = document.createElement('div');
+            menu.className = 'coverage-menu';
+            menu.dataset.for = trigger.dataset.id;
+            menu.innerHTML = items.innerHTML;
+            document.body.appendChild(menu);
+            const r = trigger.getBoundingClientRect();
+            const top = r.bottom + window.scrollY + 2;
+            let left = r.left + window.scrollX;
+            const overflow = left + menu.offsetWidth - (window.scrollX + document.documentElement.clientWidth - 8);
+            if (overflow > 0) left -= overflow;
+            menu.style.top = top + 'px';
+            menu.style.left = Math.max(8, left) + 'px';
+            openMenu = menu;
+        });
+    });
+    document.addEventListener('click', e => {
+        if (openMenu && !openMenu.contains(e.target)) closeMenu();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+    window.addEventListener('resize', closeMenu);
+    window.addEventListener('scroll', closeMenu, true);
+})();
+</script>
 </body>
 </html>
 """
@@ -323,14 +384,24 @@ def build_coverage(sermons):
                 cells.append('<td class="empty"></td>')
             elif n in sundays:
                 items = sundays[n]
-                links = "".join(
-                    f'<a href="sermon.html?id={s["id"]}"'
-                    f' title="{escape(s["title"] or s["dateFormatted"])}">'
-                    f'<b>{n}{s["suffix"]}</b></a>'
-                    for s in items
-                )
-                cls = "filled multi" if len(items) > 1 else "filled"
-                cells.append(f'<td class="{cls}">{links}</td>')
+                if len(items) == 1:
+                    s = items[0]
+                    tip = escape(s["title"] or s["dateFormatted"])
+                    cells.append(
+                        f'<td class="filled"><a href="sermon.html?id={s["id"]}" title="{tip}"><b>{n}</b></a></td>'
+                    )
+                else:
+                    cell_id = f"{year}-{n}"
+                    menu_links = "".join(
+                        f'<a href="sermon.html?id={s["id"]}">{escape(s["title"] or s["dateFormatted"])}</a>'
+                        for s in items
+                    )
+                    tip = escape(f"{len(items)} sermons")
+                    cells.append(
+                        f'<td class="filled"><a class="multi-trigger" href="#" '
+                        f'data-id="{cell_id}" title="{tip}"><b>{n}</b></a>'
+                        f'<div class="multi-items">{menu_links}</div></td>'
+                    )
             else:
                 cells.append('<td class="empty"></td>')
         rows.append(f'        <tr><th class="year-label">{year}</th>{"".join(cells)}</tr>')
