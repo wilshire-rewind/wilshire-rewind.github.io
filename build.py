@@ -22,12 +22,12 @@ def load_config():
 
 
 def parse_date(name):
-    """Sermon_MMDDYY → datetime"""
-    m = re.match(r"Sermon_(\d{2})(\d{2})(\d{2})$", name)
+    """Sermon_MMDDYY[suffix] → (datetime, suffix). Suffix is a single lowercase letter or ''."""
+    m = re.match(r"Sermon_(\d{2})(\d{2})(\d{2})([a-z]?)$", name)
     if not m:
         return None
     month, day, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
-    return datetime(2000 + year, month, day)
+    return datetime(2000 + year, month, day), m.group(4)
 
 
 def parse_srt_duration(path):
@@ -114,9 +114,10 @@ def load_sermons():
     sermons = []
     for mp3 in sorted((SRC / "audio").glob("Sermon_*.mp3")):
         name = mp3.stem
-        date = parse_date(name)
-        if not date:
+        parsed = parse_date(name)
+        if not parsed:
             continue
+        date, suffix = parsed
         srt = SRC / "subtitles" / f"{name}.srt"
         txt = SRC / "transcriptions" / f"{name}.txt"
         dur = parse_srt_duration(srt) if srt.exists() else 0
@@ -126,6 +127,7 @@ def load_sermons():
             "id": name,
             "date": date.strftime("%Y-%m-%d"),
             "dateFormatted": date.strftime("%B %-d, %Y"),
+            "suffix": suffix,
             "durationSeconds": dur,
             "durationDisplay": fmt_display(dur),
             "durationHMS": fmt_hhmmss(dur),
@@ -139,7 +141,12 @@ def load_sermons():
             "fileSizeBytes": mp3.stat().st_size,
             "_text": text,
         })
-    sermons.sort(key=lambda s: s["date"])
+    sermons.sort(key=lambda s: (s["date"], s["id"]))
+    day_pos = {}
+    for s in sermons:
+        n = day_pos.get(s["date"], 0)
+        s["_dayPos"] = n
+        day_pos[s["date"]] = n + 1
     return sermons
 
 
@@ -151,10 +158,12 @@ def build_rss(sermons, config):
 
     items = []
     for s in reversed(sermons):
-        date = datetime.fromisoformat(s["date"])
-        pub = date.strftime("%a, %d %b %Y 00:00:00 +0000")
+        date = datetime.fromisoformat(s["date"]) + timedelta(minutes=s["_dayPos"])
+        pub = date.strftime("%a, %d %b %Y %H:%M:%S +0000")
         url = f"{site_url}/{s['audioUrl']}"
-        item_title = s["title"] or s["dateFormatted"]
+        item_title = s["title"] or (
+            f"{s['dateFormatted']} ({s['suffix']})" if s["suffix"] else s["dateFormatted"]
+        )
         transcript_tag = ""
         if s["captionsUrl"]:
             srt_url = escape(f"{site_url}/{s['captionsUrl']}")
@@ -234,7 +243,8 @@ COVERAGE_TEMPLATE = """<!DOCTYPE html>
             color: #f5f2ec; text-decoration: none;
             display: block; line-height: 22px;
         }
-        .coverage-grid td.filled:hover { background: #1a1a2e; }
+        .coverage-grid td.filled a:hover { background: #1a1a2e; }
+        .coverage-grid td.filled.multi a + a { border-top: 1px solid rgba(245,242,236,0.35); }
         footer { text-align: center; padding: 3rem 1rem 2rem; font-size: 0.8rem; color: #aaa; font-family: 'Helvetica Neue', Arial, sans-serif; }
     </style>
 </head>
@@ -274,7 +284,7 @@ def build_coverage(sermons):
         sunday = d - timedelta(days=(d.weekday() - 6) % 7)
         year = sunday.year
         n = (sunday - first_sunday_of(year)).days // 7 + 1
-        by_year_n.setdefault(year, {}).setdefault(n, s)
+        by_year_n.setdefault(year, {}).setdefault(n, []).append(s)
 
     cols = max((sundays_in_year(y) for y in by_year_n), default=0)
 
@@ -287,11 +297,15 @@ def build_coverage(sermons):
             if n > n_sundays:
                 cells.append('<td class="empty"></td>')
             elif n in sundays:
-                s = sundays[n]
-                tip = escape(s["title"] or s["dateFormatted"])
-                cells.append(
-                    f'<td class="filled"><a href="sermon.html?id={s["id"]}" title="{tip}"><b>{n}</b></a></td>'
+                items = sundays[n]
+                links = "".join(
+                    f'<a href="sermon.html?id={s["id"]}"'
+                    f' title="{escape(s["title"] or s["dateFormatted"])}">'
+                    f'<b>{n}{s["suffix"]}</b></a>'
+                    for s in items
                 )
+                cls = "filled multi" if len(items) > 1 else "filled"
+                cells.append(f'<td class="{cls}">{links}</td>')
             else:
                 cells.append('<td class="empty"></td>')
         rows.append(f'        <tr><th class="year-label">{year}</th>{"".join(cells)}</tr>')
